@@ -14,6 +14,7 @@ install.packages("C:/Users/obiew/Desktop/github/dufours_antimicrobiality/grofit_
 library(tidyverse)
 library(data.table) #used for grofit prep
 library(grofit)
+library(FSA) # for dunntest
 
 
 ## read in data ####
@@ -148,8 +149,78 @@ grofit$treatment <- as.factor(grofit$treatment)
 grofit$microbe <- as.factor(grofit$microbe)
 grofit$species <- as.factor(grofit$species)
 
+
+
+#then I totally forgot, I only used 95 wells so drop the empty one...
+grofit<- grofit[!(grofit$treatment==""),]
+
+grofit <- droplevels(grofit)
+
 # then write to csv for use later in analysis
 write.csv(grofit, "output/dufours_6may2022_grofitresults.csv")
+
+
+
+
+
+
+
+
+
+
+### quick speed graphing ####
+
+
+# hmmm... so strangely the controls did not grow well for DC3000 nand SCC477 but other treatments did...
+grofit %>%
+  group_by(microbe)%>%
+  filter(treatment == "control") %>%
+  summarise(max=max(A.model))
+
+
+grofit %>%
+  ggplot(aes(x=treatment, y=A.model))+
+  geom_boxplot()+
+  facet_wrap(~microbe)
+
+
+grofit %>%
+  ggplot(aes(x=treatment, y=mu.model))+
+  geom_boxplot()+
+  facet_wrap(~microbe)
+
+
+
+  
+  
+  
+aov(data=grofit, A.model ~ treatment)
+
+grofit_no_strep <- grofit %>%
+  filter(!treatment == " +")
+
+
+
+kwtest.A<- lapply(split(grofit, grofit$microbe), function(i){
+  kruskal.test(A.model ~ treatment, data = i)
+})
+kwtest.A
+
+
+#when you dunn all together only strep comes out significant because well such a crazy effect
+dunn.A<- lapply(split(grofit, grofit$microbe), function(i){
+  dunnTest(A.model~treatment, data=i, method="holm")
+})
+
+dunn.A
+
+# if you remove strep you get some significant treatment impacts
+dunn.A<- lapply(split(grofit_no_strep, grofit_no_strep$microbe), function(i){
+  dunnTest(A.model~treatment, data=i, method="holm")
+})
+
+dunn.A
+
 
 
 
