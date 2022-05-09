@@ -1,53 +1,54 @@
-# grofit analysis, updated from my older code, to analyze 96 well optical curves.
-# may 2022
-# Tobias Mueller
+# 2021 plate analysis
+# 4mM h2o2
+# 3/12/21
+# tobias mueller
 
 
 
+#------------------- setup and packages ---------------------------------------
 
-## first packages and grofit ####
+#setwd("C:/Users/obiew/Desktop/vannette/growthassay_2021")
 
-# grofit is no longer updated on CRAN so must be downloaded manually here [https://cran.r-project.org/src/contrib/Archive/grofit/]
-#easiest way  is to download from link above and use rtools to install with line below
-install.packages("C:/Users/obiew/Desktop/github/dufours_antimicrobiality/grofit_1.1.1-1.tar.gz", repos=NULL, type="source")
-
-library(tidyverse)
-library(data.table) #used for grofit prep
 library(grofit)
+library(ggplot2)
+library(gridExtra)
+library(tidyverse)
+library(data.table)
+library(growthcurver)
 
-
-## read in data ####
 rm(list = ls())
 
 
+#---------------------- part I --  reformatting the df --------------------------------------------------
 
-d <- read.csv("input/dufours_may6_2022_tidy.csv")
-labels <- read.csv("input/6may2022_dufours_plate_setup.csv")
-d <- rename(d, c("time" = "Time")) #because i dont like capitals
-
+#read in data 
+d <- read.csv("input/4mMh2o2_5april2021_export.csv")
+labels <- read.csv("input/2021labels.csv")
+d <- rename(d, c("time" = "Time"))
 
 # fix labels classes
 labels$treatment <- as.factor(labels$treatment)
 labels$well <- as.factor(labels$well)
 labels$microbe <- as.factor(labels$microbe)
 
+
 # make time in minutes (rounded to nearest 15 (1 read is taken every 15 minutes)
 d$time <- (seq.int(nrow(d)))*15
 
 
-
-
-#now to get it to match the required df format of grofit
+#now to get it to match the required df format
 
 # transpose df
 d <- t(d)
 d <- as.data.frame(d)
 
-
 # get the row labels as column 1
 setDT(d, keep.rownames = TRUE)[]
 # make time the headers
+
+# redataframe it
 d <- as.data.frame(d)
+
 
 #fix df formate
 names(d) <- d[1,]
@@ -59,22 +60,107 @@ gr <- merge(d, labels, by.x="time", by.y="well", incomparables=NA)
 
 
 #now add 2 random columns because the package demands it
-gr <- cbind(gr, species="C. inequalis")
+gr <- cbind(gr, treatment="4mM h2o2", date="mar 12")
 
 
-gr<- gr %>%
-  relocate( c(treatment, microbe, species), .before = time)
+# then for my sanity we're gonna move the treatment labels to the front of the df
+# not that it matters but I like to look at it from time to time
+
+#useing function moveMe, move treatment information to the front
+moveMe <- function(data, tomove, where = "last", ba = NULL) {
+  temp <- setdiff(names(data), tomove)
+  x <- switch(
+    where,
+    first = data[c(tomove, temp)],
+    last = data[c(temp, tomove)],
+    before = {
+      if (is.null(ba)) stop("must specify ba column")
+      if (length(ba) > 1) stop("ba must be a single character string")
+      data[append(temp, values = tomove, after = (match(ba, temp)-1))]
+    },
+    after = {
+      if (is.null(ba)) stop("must specify ba column")
+      if (length(ba) > 1) stop("ba must be a single character string")
+      data[append(temp, values = tomove, after = (match(ba, temp)))]
+    })
+  x
+}
+
+gr <- moveMe(gr, c("treatment", "microbe", "date"), "first")
+
+# further analysis gets sad with strain and type columns so drop those here before writing
+# theyre mostly for graphing and can be added back later
+gr<- subset(gr, select=-c(name,type))
+
+
+write.csv(gr, "input/4mM_h2o2_formatted.csv", row.names = FALSE)
+
+# okay we now have our data frame in the correct format to move forward
+# to the next step
+# which is more dataframe reformatting!!
 
 
 
 
-## grofit curve fitting ####
+#-------------- Part II -- quick graphing ------ # cut this part --------------------------------------
+# grill that cheese. melt it.
+melt1<-reshape2::melt(d, id.vars = "time", variable.name = "well")
+
+# fix column names
+colnames(melt1)[1] <- "well"
+colnames(melt1)[2] <- "time"
+
+#make a df for easy graphing
+graph <- merge(melt1, labels, by="well", incomparables=NA)
+graph$microbe <- as.factor(graph$microbe)
+graph$treatment <- as.factor(graph$treatment)
+graph$well <- as.factor(graph$well)
 
 
-od<-gr[1,5:ncol(gr)]
-od<-matrix(od, byrow=T, ncol=ncol(gr)-4, nrow=nrow(gr))
-# this removes labels and makes a matrix of just od values
-od<-data.frame(od)
+graph <- arrange(graph, time, group_by = well)
+
+
+# adjust for starting OD value
+graph<- graph %>%
+  group_by(well) %>% 
+  mutate(value_adjust=value- first(value))
+
+
+
+ggplot(graph, aes(x=time, y=value, color=treatment)) +
+  geom_point(aes(), alpha=0.5) +
+  facet_wrap(graph$well, scales = "free_y") +
+  theme_bw() +
+  labs(title="4mM h2o2")
+
+
+ggplot(graph, aes(x=time, y=value_adjust, color=treatment)) +
+  geom_point(aes(), alpha=0.5) +
+  facet_wrap(graph$microbe ~ graph$name + graph$type, scales = "free_y") +
+  theme_bw() +
+  labs(title="4mM h2o2")
+
+
+
+
+
+# --------------------- begin the real part ------------------------------------------------------
+
+# check the data frame is the same - it should be from left to right:
+# 3 treatment information columns at the start - there MUST be 3
+# then a row labeled "time" that contains all the well numbers, each well number being a seperate row
+# to the right of this the column headers are now the time stamps
+# the cell information in each row is the OD reading for the well at that time stamp
+
+
+
+
+gr<-read.csv("input/4mM_h2o2_formatted.csv", na.strings=c(".", "NA"))
+t<-read.csv("input/4mM_h2o2_formatted.csv", header=F)
+times<-t[1,5:ncol(t)]
+times<-matrix(times, byrow=T, ncol=ncol(gr)-4, nrow=nrow(gr))
+# this removes labels and makes a matrix of just time stamps
+times<-data.frame(times)
 # then dataframes it
 
 # create a number string of ODinit; replicate into a matrix the size of your raw data
@@ -90,14 +176,14 @@ tOD2 <- gr[,5:ncol(gr)]-ODmat
 #then any negatives set to zero
 tOD2 <- replace(tOD2, tOD2 < 0, 0)
 
-grow.m2<-cbind(gr[,1:3],tOD2)
+grow.m2<-cbind(gr[,1],gr[,2:3],tOD2)
 
 
 
 
 
 # set controls for how the gro.fit modeling runs
-control1<-grofit.control(fit.opt="b", log.y.gc=FALSE, interactive=F)
+control1<-grofit.control(fit.opt="b", log.y.gc=FALSE, interactive=T)
 
 # neg.nan.act       -- Logical, indicates wether the program should stop when negative growth values or NA values appear (TRUE). Otherwise the program removes this values silently (FALSE). Improper values may be caused by incorrect data or input errors. Default: FALSE.
 # clean.bootstrap   -- Logical, determines if negative values which occur during bootstrap should be removed (TRUE) or kept (FALSE). Note: Infinite values are always removed. Default: TRUE.
@@ -122,8 +208,15 @@ control1<-grofit.control(fit.opt="b", log.y.gc=FALSE, interactive=F)
 growth.test<-gcFit(times,grow.m2, control=control1)
 
 
+#decline - well 25
+
+
 #use the built in summary function and write parameters  a df
-grofit<-summary.gcFit(growth.test)
+parms<-summary.gcFit(growth.test)
+
+
+
+
 
 # lambda = length of lag phase
 # mu = maximum growth rate
@@ -131,25 +224,43 @@ grofit<-summary.gcFit(growth.test)
 
 
 
-
-
 #then remove unreliable wells
-grofit<-grofit[grofit$reliability==TRUE,]
+parms<-parms[parms$reliability==TRUE,]
 
 # #and set NAs to zero for nu and A
-grofit$mu.model[is.na(grofit$mu.model)] <- 0
-grofit$A.model[is.na(grofit$A.model)] <- 0
+parms$mu.model[is.na(parms$mu.model)] <- 0
+parms$A.model[is.na(parms$A.model)] <- 0
 
 
-grofit <- rename(grofit, c("microbe" = "AddId"))
-grofit <- rename(grofit, c("treatment" = "TestId"))
-grofit <- rename(grofit, c("species" = "concentration"))
-grofit$treatment <- as.factor(grofit$treatment)
-grofit$microbe <- as.factor(grofit$microbe)
-grofit$species <- as.factor(grofit$species)
+parms <- rename(parms, c("microbe" = "AddId"))
+parms <- rename(parms, c("treatment" = "TestId"))
+parms$treatment <- as.factor(parms$treatment)
+parms$microbe <- as.factor(parms$microbe)
 
 # then write to csv for use later in analysis
-write.csv(grofit, "output/dufours_6may2022_grofitresults.csv")
+write.csv(parms, "output/4mM_h2o2_summary.csv")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
