@@ -7,7 +7,7 @@
 
 ## first packages and grofit ####
 
-# grofit is no longer updated on CRAN so must be downloaded manually here [https://cran.r-project.org/src/contrib/Archive/grofit/]
+# grofit is no longer updated on CRAN so must be downloaded manually here `[https://cran.r-project.org/src/contrib/Archive/grofit/]`
 #easiest way  is to download from link above and use rtools to install with line below
 install.packages("C:/Users/obiew/Desktop/github/dufours_antimicrobiality/grofit_1.1.1-1.tar.gz", repos=NULL, type="source")
 
@@ -98,7 +98,7 @@ grow.m2<-cbind(gr[,1:3],tOD2)
 
 
 # set controls for how the gro.fit modeling runs
-control1<-grofit.control(fit.opt="b", log.y.gc=FALSE, interactive=F)
+control1<-grofit.control(fit.opt="b", log.y.gc=FALSE, interactive=T)
 
 # neg.nan.act       -- Logical, indicates wether the program should stop when negative growth values or NA values appear (TRUE). Otherwise the program removes this values silently (FALSE). Improper values may be caused by incorrect data or input errors. Default: FALSE.
 # clean.bootstrap   -- Logical, determines if negative values which occur during bootstrap should be removed (TRUE) or kept (FALSE). Note: Infinite values are always removed. Default: TRUE.
@@ -120,7 +120,7 @@ control1<-grofit.control(fit.opt="b", log.y.gc=FALSE, interactive=F)
 
 
 #run grofit
-growth.test<-gcFit(times,grow.m2, control=control1)
+growth.test<-gcFit(od,grow.m2, control=control1)
 
 
 #use the built in summary function and write parameters  a df
@@ -193,9 +193,7 @@ grofit %>%
 
   
   
-  
-aov(data=grofit, A.model ~ treatment)
-
+# lets also look at things without the positive control
 grofit_no_strep <- grofit %>%
   filter(!treatment == " +")
 
