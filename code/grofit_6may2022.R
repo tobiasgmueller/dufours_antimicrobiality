@@ -3,6 +3,10 @@
 # Tobias Mueller
 
 
+# skip data read in and curve fitting if not running on a new plate
+# these have already been done and saved as a csv.
+
+
 
 
 ## first packages and grofit ####
@@ -17,7 +21,7 @@ library(grofit)
 library(FSA) # for dunntest
 
 
-## read in data ####
+### read in data ####
 rm(list = ls())
 
 
@@ -69,7 +73,7 @@ gr<- gr %>%
 
 
 
-## grofit curve fitting ####
+### grofit curve fitting ####
 
 
 od<-gr[1,5:ncol(gr)]
@@ -163,7 +167,9 @@ write.csv(grofit, "output/dufours_6may2022_grofitresults.csv")
 
 
 
+# start here for analysis ####
 
+grofit<- write.csv(grofit, "output/dufours_6may2022_grofitresults.csv")
 
 
 
