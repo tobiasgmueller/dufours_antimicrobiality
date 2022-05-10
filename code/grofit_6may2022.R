@@ -19,6 +19,7 @@ library(tidyverse)
 library(data.table) #used for grofit prep
 library(grofit)
 library(FSA) # for dunntest
+library(RColorBrewer)
 
 
 ### read in data ####
@@ -169,7 +170,7 @@ write.csv(grofit, "output/dufours_6may2022_grofitresults.csv")
 
 # start here for analysis ####
 
-grofit<- write.csv(grofit, "output/dufours_6may2022_grofitresults.csv")
+grofit<- read.csv("output/dufours_6may2022_grofitresults.csv")
 
 
 
@@ -184,11 +185,17 @@ grofit %>%
   summarise(max=max(A.model))
 
 
-grofit %>%
+alpha<- grofit %>%
   ggplot(aes(x=treatment, y=A.model))+
-  geom_boxplot()+
-  facet_wrap(~microbe)
+  geom_boxplot(aes(fill=treatment), alpha=.5)+
+  geom_jitter(aes(fill=treatment), shape=21, color="black")+
+  ylab("Max growth")+
+  xlab("Treatment")+
+  facet_wrap(~microbe)+
+  scale_fill_brewer(palette = "Set2")
+alpha
 
+  ggsave(plot=alpha,"output/graphs/grofit_alpha.pdf")
 
 grofit %>%
   ggplot(aes(x=treatment, y=mu.model))+
