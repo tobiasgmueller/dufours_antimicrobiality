@@ -27,15 +27,15 @@ rm(list = ls())
 
 
 # run 1, with colletes inequalis
-#d <- read.csv("input/dufours_may6_2022_tidy.csv")
-#labels <- read.csv("input/6may2022_dufours_plate_setup.csv")
+d <- read.csv("input/dufours_may6_2022_tidy.csv")
+labels <- read.csv("input/6may2022_dufours_plate_setup.csv")
 
 
 # run 2, to test if frozen colletes glands have same results
 # and to verify if scc477 and dc3000 can even grow in lb broth
-d <- read.csv("input/dufours_frozen_13may2022_test.csv")
-labels <- read.csv("input/dufours_frozen_13may2022_plate_setup.csv")
-
+# d <- read.csv("input/dufours_frozen_13may2022_test.csv")
+# labels <- read.csv("input/dufours_frozen_13may2022_plate_setup.csv")
+# 
 
 
 
@@ -74,7 +74,7 @@ d <- d[-1,]
 gr <- merge(d, labels, by.x="time", by.y="well", incomparables=NA)
 
 
-#now add 2 random columns because the package demands it
+#now add columns because the package demands it
 gr <- cbind(gr, species="C. inequalis")
 
 
@@ -109,6 +109,14 @@ tOD2 <- replace(tOD2, tOD2 < 0, 0)
 grow.m2<-cbind(gr[,1:3],tOD2)
 
 
+grow.long <- grow.m2%>%
+  melt(id.vars = c("treatment","microbe","species"), value.name = "od", variable.name = "time")
+
+curves<- ggplot(grow.long)+
+  geom_point(aes(x=time, y=od, color=treatment))+
+  facet_wrap(~microbe)
+curves
+ggsave(plot=curves, filename = "output/6may.png")
 
 
 

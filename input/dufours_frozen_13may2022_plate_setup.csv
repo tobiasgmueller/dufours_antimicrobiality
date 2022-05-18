@@ -16,14 +16,14 @@ C9,Control,s17-1
 C10, 1/4,s17-1
 D3, 1/4,s17-1
 D4, 1/4,s17-1
-D5,Control,2698B
+D5,Control,2689B
 D6,Control,dc3000
-D7,Control,2698B
+D7,Control,2689B
 D8,Control,s17-1
 D9, 1/2,s17-1
 D10, 1/2,2689B
 E3, 1/4,s17-1
-E4,Control,2698B
+E4,Control,2689B
 E5, 1/4,s17-1
 E6, 1/2,2689B
 E7, 1/4,2689B
@@ -36,13 +36,13 @@ F5, 1/2,s17-1
 F6, 1/4,2689B
 F7,Control,dc3000
 F8,Control,scc477
-F9,Control,2698B
+F9,Control,2689B
 F10, 1/4,s17-1
 G3, 1/2,2689B
 G4, 1/2,s17-1
 G5,,
 G6,Control,s17-1
-G7,Control,2698B
+G7,Control,2689B
 G8, 1/4,2689B
 G9,Control,scc477
 G10,Control,dc3000
