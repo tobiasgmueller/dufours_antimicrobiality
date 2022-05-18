@@ -1,4 +1,6 @@
 # grofit analysis, updated from my older code, to analyze 96 well optical curves.
+# HERE IS AN ATTEMPT TO GET DATA FROM WELLS THAT CANT HAVE CURVES FITTED
+# BY SIMPLE AVERAGING BY THE HOUR AND FIGURING OUT THE HIGHEST OD VALUE
 # may 2022
 # Tobias Mueller
 
@@ -42,6 +44,9 @@ labels <- read.csv("input/dufours_frozen_13may2022_plate_setup.csv")
 d <- rename(d, c("time" = "Time")) #because i dont like capitals
 
 
+
+
+
 # fix labels classes
 labels$treatment <- as.factor(labels$treatment)
 labels$well <- as.factor(labels$well)
@@ -49,6 +54,26 @@ labels$microbe <- as.factor(labels$microbe)
 
 # make time in minutes (rounded to nearest 15 (1 read is taken every 15 minutes)
 d$time <- (seq.int(nrow(d)))*15
+
+
+
+
+### grofit bypass aggregate section #### _______________________
+
+# First create hour grouping variable which will be aggregated across
+# first drop the last data point so its a multiple of 4
+
+
+d$hour <- rep(1:(nrow(d)/4), each = 4)
+
+
+gr %>% 
+  
+  
+  Avgs <- mydf %>% group_by(Group) %>% summarize(Avg = mean(results))
+`summarise()` ungrouping output (override with `.groups` argument)
+Avgs
+
 
 
 
@@ -80,6 +105,13 @@ gr <- cbind(gr, species="C. inequalis")
 
 gr<- gr %>%
   relocate( c(treatment, microbe, species), .before = time)
+
+
+
+
+
+
+
 
 
 
@@ -136,6 +168,7 @@ control1<-grofit.control(fit.opt="b", log.y.gc=FALSE, interactive=T)
 
 #run grofit
 growth.test<-gcFit(od,grow.m2, control=control1)
+
 
 
 #use the built in summary function and write parameters  a df
