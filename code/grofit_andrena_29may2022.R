@@ -26,16 +26,10 @@ library(RColorBrewer)# for graph colors
 rm(list = ls())
 
 
-# run 1, with colletes inequalis
-d <- read.csv("input/dufours_may6_2022_tidy.csv")
-labels <- read.csv("input/6may2022_dufours_plate_setup.csv")
+# run 1, andrena regularis dufours and sternal glands
+d <- read.csv("input/andrena_glands_24may2022.csv")
+labels <- read.csv("input/24may2022_A_regularis_trtlist.csv")
 
-
-# run 2, to test if frozen colletes glands have same results
-# and to verify if scc477 and dc3000 can even grow in lb broth
-# d <- read.csv("input/dufours_frozen_13may2022_test.csv")
-# labels <- read.csv("input/dufours_frozen_13may2022_plate_setup.csv")
-# 
 
 
 
@@ -47,10 +41,11 @@ d <- rename(d, c("time" = "Time")) #because i dont like capitals
 labels$treatment <- as.factor(labels$treatment)
 labels$well <- as.factor(labels$well)
 labels$microbe <- as.factor(labels$microbe)
+labels$gland <- as.factor(labels$gland)
 
 # make time in minutes (rounded to nearest 15 (1 read is taken every 15 minutes)
 d$time <- (seq.int(nrow(d)))*15
-
+ 
 
 
 
@@ -75,12 +70,8 @@ d <- d[-1,]
 gr <- merge(d, labels, by.x="time", by.y="well", incomparables=NA)
 
 
-#now add columns because the package demands it
-gr <- cbind(gr, species="C. inequalis")
-
-
 gr<- gr %>%
-  relocate( c(treatment, microbe, species), .before = time)
+  relocate( c(treatment, microbe, gland), .before = time)
 
 
 
@@ -110,15 +101,23 @@ tOD2 <- replace(tOD2, tOD2 < 0, 0)
 grow.m2<-cbind(gr[,1:3],tOD2)
 
 
+
+test <- gr%>%
+  select(!time)%>%
+  melt(id.vars = c("treatment","microbe","gland"), value.name = "od", variable.name = "time")
+
+
+
+
 #graphing curves to visually check things
 grow.long <- grow.m2%>%
-  melt(id.vars = c("treatment","microbe","species"), value.name = "od", variable.name = "time")
+  melt(id.vars = c("treatment","microbe","gland"), value.name = "od", variable.name = "time")
 
-curves<- ggplot(grow.long)+
+curves<- ggplot(test)+
   geom_point(aes(x=time, y=od, color=treatment))+
-  facet_wrap(~microbe)
+  facet_grid(gland~microbe)
 curves
-ggsave(plot=curves, filename = "output/6may.png")
+ggsave(plot=curves, filename = "output/a_regularis.png")
 
 
 
@@ -215,7 +214,7 @@ alpha<- grofit %>%
   scale_fill_brewer(palette = "Set2")
 alpha
 
-  ggsave(plot=alpha,"output/graphs/grofit_alpha.pdf")
+ggsave(plot=alpha,"output/graphs/grofit_alpha.pdf")
 
 grofit %>%
   ggplot(aes(x=treatment, y=mu.model))+
@@ -224,8 +223,8 @@ grofit %>%
 
 
 
-  
-  
+
+
 # lets also look at things without the positive control
 grofit_no_strep <- grofit %>%
   filter(!treatment == " +")
