@@ -70,8 +70,7 @@ d$hour <- rep(1:(nrow(d)/4), each = 4)
 gr %>% 
   
   
-  Avgs <- mydf %>% group_by(Group) %>% summarize(Avg = mean(results))
-`summarise()` ungrouping output (override with `.groups` argument)
+Avgs <- mydf %>% group_by(Group) %>% summarize(Avg = mean(results))
 Avgs
 
 
