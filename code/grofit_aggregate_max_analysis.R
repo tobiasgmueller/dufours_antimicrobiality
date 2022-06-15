@@ -114,15 +114,19 @@ gr<- gr %>%
 
 
 
+write.csv(gr,"formatted_OD_values/aggregate_test", row.names = FALSE)
 
 ### grofit curve fitting ####
 
 
-od<-gr[1,5:ncol(gr)]
-od<-matrix(od, byrow=T, ncol=ncol(gr)-4, nrow=nrow(gr))
-# this removes labels and makes a matrix of just od values
-od<-data.frame(od)
+t<-read.csv("formatted_OD_values/aggregate_test", header=F)
+
+times<-t[1,5:ncol(t)]
+times<-matrix(times, byrow=T, ncol=ncol(gr)-4, nrow=nrow(gr))
+# this removes labels and makes a matrix of just time stamps
+times<-data.frame(times)
 # then dataframes it
+
 
 # create a number string of ODinit; replicate into a matrix the size of your raw data
 ODinit<-gr[,5]

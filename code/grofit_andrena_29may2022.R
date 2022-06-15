@@ -20,7 +20,7 @@ library(data.table) #used for grofit prep
 library(grofit)
 library(FSA) # for dunntest
 library(RColorBrewer)# for graph colors
-
+library(rstatix) # pipeline friendly stats analysis
 
 ### read in data ####
 rm(list = ls())
@@ -75,15 +75,21 @@ gr<- gr %>%
 
 
 
+write.csv(gr,"formatted_OD_values/andrena_29may2022", row.names = FALSE)
 
 ### grofit curve fitting ####
 
 
-od<-gr[1,5:ncol(gr)]
-od<-matrix(od, byrow=T, ncol=ncol(gr)-4, nrow=nrow(gr))
-# this removes labels and makes a matrix of just od values
-od<-data.frame(od)
+t<-read.csv("formatted_OD_values/andrena_29may2022", header=F)
+
+times<-t[1,5:ncol(t)]
+times<-matrix(times, byrow=T, ncol=ncol(gr)-4, nrow=nrow(gr))
+# this removes labels and makes a matrix of just time stamps
+times<-data.frame(times)
 # then dataframes it
+
+
+
 
 # create a number string of ODinit; replicate into a matrix the size of your raw data
 ODinit<-gr[,5]
@@ -101,8 +107,8 @@ tOD2 <- replace(tOD2, tOD2 < 0, 0)
 grow.m2<-cbind(gr[,1:3],tOD2)
 
 
-
-test <- gr%>%
+#then also look at without subtracting starting OD
+od_raw <- gr%>%
   select(!time)%>%
   melt(id.vars = c("treatment","microbe","gland"), value.name = "od", variable.name = "time")
 
@@ -113,7 +119,7 @@ test <- gr%>%
 grow.long <- grow.m2%>%
   melt(id.vars = c("treatment","microbe","gland"), value.name = "od", variable.name = "time")
 
-curves<- ggplot(test)+
+curves<- ggplot(grow.long)+
   geom_point(aes(x=time, y=od, color=treatment))+
   facet_grid(gland~microbe)
 curves
@@ -144,7 +150,7 @@ control1<-grofit.control(fit.opt="b", log.y.gc=FALSE, interactive=T)
 
 
 #run grofit
-growth.test<-gcFit(od,grow.m2, control=control1)
+growth.test<-gcFit(times,grow.m2, control=control1)
 
 
 #use the built in summary function and write parameters  a df
@@ -168,20 +174,20 @@ grofit$A.model[is.na(grofit$A.model)] <- 0
 
 grofit <- rename(grofit, c("microbe" = "AddId"))
 grofit <- rename(grofit, c("treatment" = "TestId"))
-grofit <- rename(grofit, c("species" = "concentration"))
+grofit <- rename(grofit, c("gland" = "concentration"))
 grofit$treatment <- as.factor(grofit$treatment)
 grofit$microbe <- as.factor(grofit$microbe)
 grofit$species <- as.factor(grofit$species)
 
 
 
-#then I totally forgot, I only used 95 wells so drop the empty one...
+#then if I didnt use all wells, drop empty ones
 grofit<- grofit[!(grofit$treatment==""),]
 
 grofit <- droplevels(grofit)
 
 # then write to csv for use later in analysis
-write.csv(grofit, "output/dufours_6may2022_grofitresults.csv")
+write.csv(grofit, "output/dufours_andrena_29may2022_grofitresults.csv")
 
 
 
@@ -189,17 +195,19 @@ write.csv(grofit, "output/dufours_6may2022_grofitresults.csv")
 
 # start here for analysis ####
 
-grofit<- read.csv("output/dufours_6may2022_grofitresults.csv")
+grofit<- read.csv("output/dufours_andrena_29may2022_grofitresults.csv")
 
 
 
 
-### quick speed graphing ####
+### quick speed graphing and tablesS ####
+
+# also adjust levels so low med high in order
+grofit$treatment<- factor(grofit$treatment, levels = c("control", "low", "medium", "high"))
 
 
-# hmmm... so strangely the controls did not grow well for DC3000 nand SCC477 but other treatments did...
 grofit %>%
-  group_by(microbe)%>%
+  group_by(microbe, gland)%>%
   filter(treatment == "control") %>%
   summarise(max=max(A.model))
 
@@ -210,46 +218,23 @@ alpha<- grofit %>%
   geom_jitter(aes(fill=treatment), shape=21, color="black")+
   ylab("Max growth")+
   xlab("Treatment")+
-  facet_wrap(~microbe)+
+  facet_grid(gland~microbe)+
   scale_fill_brewer(palette = "Set2")
 alpha
 
-ggsave(plot=alpha,"output/graphs/grofit_alpha.pdf")
+ggsave(plot=alpha,"output/graphs/grofit_alpha_andrena_29may2022.pdf")
+
+
 
 grofit %>%
-  ggplot(aes(x=treatment, y=mu.model))+
-  geom_boxplot()+
-  facet_wrap(~microbe)
+  group_by(gland,microbe)%>%
+  kruskal_test(A.model ~ treatment)
 
+grofit %>%
+  group_by(gland,microbe)%>%
+  dunn_test(A.model ~ treatment) %>%
+  print(n=40)
 
-
-
-
-# lets also look at things without the positive control
-grofit_no_strep <- grofit %>%
-  filter(!treatment == " +")
-
-
-
-kwtest.A<- lapply(split(grofit, grofit$microbe), function(i){
-  kruskal.test(A.model ~ treatment, data = i)
-})
-kwtest.A
-
-
-#when you dunn all together only strep comes out significant because well such a crazy effect
-dunn.A<- lapply(split(grofit, grofit$microbe), function(i){
-  dunnTest(A.model~treatment, data=i, method="holm")
-})
-
-dunn.A
-
-# if you remove strep you get some significant treatment impacts
-dunn.A<- lapply(split(grofit_no_strep, grofit_no_strep$microbe), function(i){
-  dunnTest(A.model~treatment, data=i, method="holm")
-})
-
-dunn.A
 
 
 

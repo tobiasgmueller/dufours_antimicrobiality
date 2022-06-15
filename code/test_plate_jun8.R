@@ -20,25 +20,20 @@ library(data.table) #used for grofit prep
 library(grofit)
 library(FSA) # for dunntest
 library(RColorBrewer)# for graph colors
-
+library(rstatix)
 
 ### read in data ####
 rm(list = ls())
 
 
-# run 1, with colletes inequalis
-d <- read.csv("input/dufours_may6_2022_tidy.csv")
-labels <- read.csv("input/6may2022_dufours_plate_setup.csv")
+# run 1, andrena regularis dufours and sternal glands
+d <- read.csv("input/testplate_8june2022.csv")
+labels <- read.csv("input/testplate_8june2022_trtlist.csv")
 
 
-# run 2, to test if frozen colletes glands have same results
-# and to verify if scc477 and dc3000 can even grow in lb broth
-# d <- read.csv("input/dufours_frozen_13may2022_test.csv")
-# labels <- read.csv("input/dufours_frozen_13may2022_plate_setup.csv")
-# 
-
-
-
+# enter number of meta data columns here
+# IMPORTANT
+C <- 3
 
 d <- rename(d, c("time" = "Time")) #because i dont like capitals
 
@@ -75,56 +70,75 @@ d <- d[-1,]
 gr <- merge(d, labels, by.x="time", by.y="well", incomparables=NA)
 
 
-#now add columns because the package demands it
-gr <- cbind(gr, species="C. inequalis")
-
-
 gr<- gr %>%
-  relocate( c(treatment, microbe, species), .before = time)
+  relocate( c(treatment, microbe), .before = time)
 
 
 
-write.csv(gr,"formatted_OD_values/6may2022.csv", row.names = FALSE)
+
+
+write.csv(gr,"formatted_OD_values/june8_test_plate", row.names = FALSE)
 
 ### grofit curve fitting ####
 
 
-t<-read.csv("formatted_OD_values/6may2022.csv", header=F)
+t<-read.csv("formatted_OD_values/june8_test_plate", header=F)
 
-times<-t[1,5:ncol(t)]
-times<-matrix(times, byrow=T, ncol=ncol(gr)-4, nrow=nrow(gr))
+times<-t[1,(C+1):ncol(t)]
+times<-matrix(times, byrow=T, ncol=ncol(gr)-C, nrow=nrow(gr))
 # this removes labels and makes a matrix of just time stamps
 times<-data.frame(times)
 # then dataframes it
 
+
+
+
 # create a number string of ODinit; replicate into a matrix the size of your raw data
-ODinit<-gr[,5]
-ODmat<-matrix(ODinit, byrow=FALSE, ncol=ncol(gr)-4, nrow=nrow(gr))
+ODinit<-gr[,(C+1)]
+ODmat<-matrix(ODinit, byrow=FALSE, ncol=ncol(gr)-C, nrow=nrow(gr))
 
 
 # subtract starting OD
-tOD2 <- gr[,5:ncol(gr)]-ODmat
+tOD2 <- gr[,(C+1):ncol(gr)]-ODmat
+
 
 #then any negatives set to zero
 tOD2 <- replace(tOD2, tOD2 < 0, 0)
 
-grow.m2<-cbind(gr[,1:3],tOD2)
+grow.m2<-cbind(gr[,1:(C-1)],tOD2)
+
+#then also look at without subtracting starting OD
+od_raw <- gr%>%
+  select(!time)%>%
+  melt(id.vars = c("treatment","microbe"), value.name = "od", variable.name = "time")
+
 
 
 #graphing curves to visually check things
 grow.long <- grow.m2%>%
-  melt(id.vars = c("treatment","microbe","species"), value.name = "od", variable.name = "time")
+  melt(id.vars = c("treatment","microbe"), value.name = "od", variable.name = "time")
 
 curves<- ggplot(grow.long)+
   geom_point(aes(x=time, y=od, color=treatment))+
   facet_wrap(~microbe)
 curves
-ggsave(plot=curves, filename = "output/6may.png")
+ggsave(plot=curves, filename = "output/curves_od_test_plate_june8_2022.png")
 
 
+grow.long %>% 
+  filter(microbe == "S17")%>%
+  ggplot()+
+  geom_point(aes(x=time, y=od, color=treatment))+
+  facet_wrap(~microbe)
+
+grow.long %>% 
+  filter(microbe == "2698b")%>%
+  ggplot()+
+  geom_point(aes(x=time, y=od, color=treatment))+
+  facet_wrap(~microbe)
 
 # set controls for how the gro.fit modeling runs
-control1<-grofit.control(fit.opt="b", log.y.gc=FALSE, interactive=T)
+control1<-grofit.control(fit.opt="b", log.y.gc=FALSE, interactive=F)
 
 # neg.nan.act       -- Logical, indicates wether the program should stop when negative growth values or NA values appear (TRUE). Otherwise the program removes this values silently (FALSE). Improper values may be caused by incorrect data or input errors. Default: FALSE.
 # clean.bootstrap   -- Logical, determines if negative values which occur during bootstrap should be removed (TRUE) or kept (FALSE). Note: Infinite values are always removed. Default: TRUE.
@@ -144,9 +158,15 @@ control1<-grofit.control(fit.opt="b", log.y.gc=FALSE, interactive=T)
 # nboot.dr          -- Numeric value, defining the number of bootstrap samples for EC50 estimation. Use nboot.dr=0 to disable bootstrapping. Default: 0.
 
 
+grow.m2$date <- ("8june2022")
 
 #run grofit
 growth.test<-gcFit(times,grow.m2, control=control1)
+# if you get an error saying "length of input vectors differ!"
+# this is because grow.m2 MUST be equal rows and exactly 3 columns larger than times
+# add columns as needed
+
+
 
 
 #use the built in summary function and write parameters  a df
@@ -183,7 +203,7 @@ grofit<- grofit[!(grofit$treatment==""),]
 grofit <- droplevels(grofit)
 
 # then write to csv for use later in analysis
-write.csv(grofit, "output/dufours_6may2022_grofitresults.csv")
+write.csv(grofit, "output/8june2022_test_grofitresults.csv")
 
 
 
@@ -191,7 +211,7 @@ write.csv(grofit, "output/dufours_6may2022_grofitresults.csv")
 
 # start here for analysis ####
 
-grofit<- read.csv("output/dufours_6may2022_grofitresults.csv")
+grofit<- read.csv("output/8june2022_test_grofitresults.csv")
 
 
 
@@ -207,6 +227,7 @@ grofit %>%
 
 
 alpha<- grofit %>%
+  filter(microbe == "S17")%>%
   ggplot(aes(x=treatment, y=A.model))+
   geom_boxplot(aes(fill=treatment), alpha=.5)+
   geom_jitter(aes(fill=treatment), shape=21, color="black")+
@@ -216,46 +237,29 @@ alpha<- grofit %>%
   scale_fill_brewer(palette = "Set2")
 alpha
 
-  ggsave(plot=alpha,"output/graphs/grofit_alpha.pdf")
+alpha<- grofit %>%
+  filter(microbe == "2698b")%>%
+  ggplot(aes(x=treatment, y=A.model))+
+  geom_boxplot(aes(fill=treatment), alpha=.5)+
+  geom_jitter(aes(fill=treatment), shape=21, color="black")+
+  ylab("Max growth")+
+  xlab("Treatment")+
+  facet_wrap(~microbe)+
+  scale_fill_brewer(palette = "Set2")
+alpha
+
 
 grofit %>%
-  ggplot(aes(x=treatment, y=mu.model))+
-  geom_boxplot()+
-  facet_wrap(~microbe)
+  filter(microbe == "S17") %>%
+  kruskal_test(A.model ~ treatment)
 
-
-
-  
-  
-# lets also look at things without the positive control
-grofit_no_strep <- grofit %>%
-  filter(!treatment == "streptomycin")
-
-
-
-kwtest.A<- lapply(split(grofit, grofit$microbe), function(i){
-  kruskal.test(A.model ~ treatment, data = i)
-})
-kwtest.A
-
-
-#when you dunn all together only strep comes out significant because well such a crazy effect
-dunn.A<- lapply(split(grofit, grofit$microbe), function(i){
-  dunnTest(A.model~treatment, data=i, method="holm")
-})
-
-dunn.A
-
-# if you remove strep you get some significant treatment impacts
-dunn.A<- lapply(split(grofit_no_strep, grofit_no_strep$microbe), function(i){
-  dunnTest(A.model~treatment, data=i, method="holm")
-})
-
-dunn.A
+grofit %>%
+  filter(microbe == "S17") %>%
+  dunn_test(A.model ~ treatment)
 
 
 
 
-
-
-
+grofit %>%
+  filter(microbe == "2698b") %>%
+  dunn_test(A.model ~ treatment)
