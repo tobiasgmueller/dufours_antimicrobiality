@@ -1,11 +1,11 @@
-# grofit analysis, updated from my older code, to analyze 96 well optical curves.
-# may 2022
-# Tobias Mueller
+# new test plate
+# looking at if mashing up flight muscles (which should be inert)
+# have effect on plate reader analysis
+# ideally they should not
+# but potentially shifting starting OD might give false results
+# lets find out!
 
-
-# skip data read in and curve fitting if not running on a new plate
-# these have already been done and saved as a csv.
-
+# 8 july 2022
 
 
 
@@ -26,11 +26,13 @@ rm(list = ls())
 
 
 # run 1, andrena regularis dufours and sternal glands
-d <- read.csv("input/testplate_8june2022.csv")
-labels <- read.csv("input/testplate_8june2022_trtlist.csv")
+d <- read.csv("input/muscle_test_plate_6july2022.csv", fileEncoding = 'UTF-8-BOM')
+labels <- read.csv("input/muscle_test_plate_6july2022_plate_setup.csv")
+
 
 
 # enter number of meta data columns here
+# ( how many columns in labels)
 # IMPORTANT
 C <- 3
 
@@ -76,15 +78,15 @@ gr<- gr %>%
 
 
 
-write.csv(gr,"formatted_OD_values/june8_test_plate", row.names = FALSE)
+write.csv(gr,"formatted_OD_values/july6_2022_muscleplate.csv", row.names = FALSE)
 
 ### grofit curve fitting ####
 
 
-t<-read.csv("formatted_OD_values/june8_test_plate", header=F)
+t<-read.csv("formatted_OD_values/july6_2022_muscleplate.csv", header=F)
 
 times<-t[1,(C+1):ncol(t)]
-times<-matrix(times, byrow=T, ncol=ncol(gr)-C, nrow=nrow(gr))
+times<-matrix(times, byrow=T, ncol=ncol(times), nrow=nrow(gr))
 # this removes labels and makes a matrix of just time stamps
 times<-data.frame(times)
 # then dataframes it
@@ -109,38 +111,30 @@ grow.m2<-cbind(gr[,1:(C-1)],tOD2)
 #then also look at without subtracting starting OD
 od_raw <- gr%>%
   select(!time)%>%
-  melt(id.vars = c("treatment","microbe"), value.name = "od", variable.name = "time")
+  melt(id.vars = c("treatment","microbe"), value.name = "od", variable.name = "time")%>%
+  filter((treatment!=""))
 
 
 
 #graphing curves to visually check things
 grow.long <- grow.m2%>%
-  melt(id.vars = c("treatment","microbe"), value.name = "od", variable.name = "time")
+  melt(id.vars = c("treatment","microbe"), value.name = "od", variable.name = "time")%>%
+  filter((treatment!=""))
 
-curves<- ggplot(grow.long)+
+curves<- od_raw%>%
+  ggplot()+
   geom_point(aes(x=time, y=od, color=treatment))+
   facet_wrap(~microbe)
 curves
-ggsave(plot=curves, filename = "output/curves_od_test_plate_june8_2022.png")
+ggsave(plot=curves, filename = "output/muscle_test_6july2022.png")
 
 
-od_raw %>% 
-  filter(microbe == "S17")%>%
-  ggplot()+
+od_raw %>% ggplot()+
   geom_point(aes(x=time, y=od, color=treatment))+
   facet_wrap(~treatment)
 
-grow.long %>% 
-  filter(microbe == "S17")%>%
-  ggplot()+
-  geom_point(aes(x=time, y=od, color=treatment))+
-  facet_wrap(~microbe)
 
-grow.long %>% 
-  filter(microbe == "2698b")%>%
-  ggplot()+
-  geom_point(aes(x=time, y=od, color=treatment))+
-  facet_wrap(~microbe)
+
 
 # set controls for how the gro.fit modeling runs
 control1<-grofit.control(fit.opt="b", log.y.gc=FALSE, interactive=F)
@@ -163,7 +157,10 @@ control1<-grofit.control(fit.opt="b", log.y.gc=FALSE, interactive=F)
 # nboot.dr          -- Numeric value, defining the number of bootstrap samples for EC50 estimation. Use nboot.dr=0 to disable bootstrapping. Default: 0.
 
 
-grow.m2$date <- ("8june2022")
+grow.m2$date <- ("6july2022")
+grow.m2 <- grow.m2%>%
+  relocate(date, .after = microbe)
+
 
 #run grofit
 growth.test<-gcFit(times,grow.m2, control=control1)
@@ -171,6 +168,8 @@ growth.test<-gcFit(times,grow.m2, control=control1)
 # this is because grow.m2 MUST be equal rows and exactly 3 columns larger than times
 # add columns as needed
 
+# if you get an error saying "Error in plot.new() : figure margins too large"
+# either make your plot pane bigger or make grofit non interactive
 
 
 
@@ -208,7 +207,7 @@ grofit<- grofit[!(grofit$treatment==""),]
 grofit <- droplevels(grofit)
 
 # then write to csv for use later in analysis
-write.csv(grofit, "output/8june2022_test_grofitresults.csv")
+write.csv(grofit, "output/6july2022_muscletest_grofitresults.csv")
 
 
 
@@ -216,23 +215,16 @@ write.csv(grofit, "output/8june2022_test_grofitresults.csv")
 
 # start here for analysis ####
 
-grofit<- read.csv("output/8june2022_test_grofitresults.csv")
+grofit<- read.csv("output/6july2022_muscletest_grofitresults.csv")
 
 
 
 
-### quick speed graphing ####
-
-
-# hmmm... so strangely the controls did not grow well for DC3000 nand SCC477 but other treatments did...
 grofit %>%
-  group_by(microbe)%>%
-  filter(treatment == "control") %>%
-  summarise(max=max(A.model))
+  group_by(treatment) %>%
+  summarise(max=max(A.model), avg=mean(A.model))
 
-
-alpha_s17<- grofit %>%
-  filter(microbe == "S17")%>%
+grofit%>%
   ggplot(aes(x=treatment, y=A.model))+
   geom_boxplot(aes(fill=treatment), alpha=.5)+
   geom_jitter(aes(fill=treatment), shape=21, color="black")+
@@ -240,31 +232,27 @@ alpha_s17<- grofit %>%
   xlab("Treatment")+
   facet_wrap(~microbe)+
   scale_fill_brewer(palette = "Set2")
-alpha_s17
 
-alpha_2698b<- grofit %>%
-  filter(microbe == "2698b")%>%
-  ggplot(aes(x=treatment, y=A.model))+
+grofit%>%
+  ggplot(aes(x=treatment, y=mu.model))+
   geom_boxplot(aes(fill=treatment), alpha=.5)+
   geom_jitter(aes(fill=treatment), shape=21, color="black")+
-  ylab("Max growth")+
+  ylab("growth rate")+
   xlab("Treatment")+
   facet_wrap(~microbe)+
   scale_fill_brewer(palette = "Set2")
-alpha_2698b
-
-
-grofit %>%
-  filter(microbe == "S17") %>%
-  kruskal_test(A.model ~ treatment)
-
-grofit %>%
-  filter(microbe == "S17") %>%
-  dunn_test(A.model ~ treatment)
 
 
 
 
-grofit %>%
-  filter(microbe == "2698b") %>%
-  dunn_test(A.model ~ treatment)
+
+kruskal_test(grofit, A.model~treatment)
+kruskal_test(grofit, mu.model~treatment)
+
+grofit%>%
+  dunn_test( A.model~treatment)
+
+grofit%>%
+  dunn_test(mu.model~treatment)
+
+
