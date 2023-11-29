@@ -208,7 +208,7 @@ grofit<- grofit[!(grofit$treatment==""),]
 grofit <- droplevels(grofit)
 
 # then write to csv for use later in analysis
-write.csv(grofit, "output/dufours_6may2022_grofitresults.csv")
+write.csv(grofit, "output/dufours_13may2022_grofitresults.csv")
 
 
 
@@ -216,7 +216,7 @@ write.csv(grofit, "output/dufours_6may2022_grofitresults.csv")
 
 # start here for analysis ####
 
-grofit<- read.csv("output/dufours_6may2022_grofitresults.csv")
+grofit<- read.csv("output/dufours_13may2022_grofitresults.csv")
 
 
 
@@ -241,7 +241,7 @@ alpha<- grofit %>%
   scale_fill_brewer(palette = "Set2")
 alpha
 
-  ggsave(plot=alpha,"output/graphs/grofit_alpha.pdf")
+  ggsave(plot=alpha,"output/graphs/grofit_alpha13may.pdf")
 
 grofit %>%
   ggplot(aes(x=treatment, y=mu.model))+

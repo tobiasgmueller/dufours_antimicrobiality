@@ -193,7 +193,13 @@ write.csv(grofit, "output/dufours_6may2022_grofitresults.csv")
 
 grofit<- read.csv("output/dufours_6may2022_grofitresults.csv")
 
+# fix treatment levels
 
+grofit$treatment <- factor(grofit$treatment, levels=c("Control", 
+                                                      'Low', 
+                                                      'Medium', 
+                                                      'High',
+                                                      "Streptomycin"))
 
 
 ### quick speed graphing ####
@@ -207,6 +213,8 @@ grofit %>%
 
 
 alpha<- grofit %>%
+  filter(microbe %in% c("2698B","S17-1"),
+         treatment != "Streptomycin")%>%
   ggplot(aes(x=treatment, y=A.model))+
   geom_boxplot(aes(fill=treatment), alpha=.5)+
   geom_jitter(aes(fill=treatment), shape=21, color="black")+
@@ -216,8 +224,23 @@ alpha<- grofit %>%
   scale_fill_brewer(palette = "Set2")
 alpha
 
-  ggsave(plot=alpha,"output/graphs/grofit_alpha.pdf")
+  ggsave(plot=alpha,"output/graphs/grofit_alpha_colletes6may2022_half.png",
+         width = 6,
+         height = 3)
 
+  
+#polished version for presentations
+  alpha<- grofit %>%
+  ggplot(aes(x=treatment, y=A.model))+
+  geom_boxplot(aes(fill=treatment), alpha=.5)+
+  geom_jitter(aes(fill=treatment), shape=21, color="black")+
+  ylab("Max growth")+
+  xlab("Treatment")+
+  facet_wrap(~microbe)+
+  scale_fill_brewer(palette = "Set2")
+alpha
+  
+  
 grofit %>%
   ggplot(aes(x=treatment, y=mu.model))+
   geom_boxplot()+

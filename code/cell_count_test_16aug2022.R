@@ -208,7 +208,7 @@ write.csv(grofit, "output/16aug2022_cellcount_grofitresults.csv")
 
 
 
-# start here for analysis ####
+# START HERE ####
 
 grofit<- read.csv("output/16aug2022_cellcount_grofitresults.csv")
 
@@ -227,6 +227,7 @@ alpha<-grofit%>%
   xlab("Treatment")+
   facet_wrap(~microbe)+
   scale_fill_brewer(palette = "Set2")
+alpha
 
 ggsave(plot=alpha, filename = "output/cellcount_16aug2022_alpha.png")
 

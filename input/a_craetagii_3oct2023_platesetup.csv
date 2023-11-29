@@ -1,0 +1,97 @@
+well,Well.Letter,Well.Number,treatment,microbe
+A1,A,1,c,s. mar
+A2,A,2,high sternal,s. mar
+A3,A,3,high dufours,e. coli
+A4,A,4,high dufours,s. mar
+A5,A,5,,
+A6,A,6,low sternal,e. coli
+A7,A,7,low dufours,s. mar
+A8,A,8,low dufours,s. mar
+A9,A,9,c,s. mar
+A10,A,10,high dufours,e. coli
+A11,A,11,low sternal,s. mar
+A12,A,12,high dufours,e. coli
+B1,B,1,high sternal,s. mar
+B2,B,2,low dufours,e. coli
+B3,B,3,,
+B4,B,4,low sternal,e. coli
+B5,B,5,high sternal,e. coli
+B6,B,6,low dufours,e. coli
+B7,B,7,high dufours,e. coli
+B8,B,8,high dufours,e. coli
+B9,B,9,,
+B10,B,10,,
+B11,B,11,high sternal,e. coli
+B12,B,12,low dufours,e. coli
+C1,C,1,low sternal,e. coli
+C2,C,2,high dufours,e. coli
+C3,C,3,c,s. mar
+C4,C,4,high sternal,e. coli
+C5,C,5,high sternal,s. mar
+C6,C,6,high sternal,s. mar
+C7,C,7,low dufours,s. mar
+C8,C,8,high sternal,s. mar
+C9,C,9,low dufours,s. mar
+C10,C,10,high sternal,e. coli
+C11,C,11,low sternal,s. mar
+C12,C,12,,
+D1,D,1,low sternal,s. mar
+D2,D,2,low sternal,s. mar
+D3,D,3,low dufours,e. coli
+D4,D,4,high dufours,s. mar
+D5,D,5,c,e. coli
+D6,D,6,c,s. mar
+D7,D,7,low dufours,e. coli
+D8,D,8,c,e. coli
+D9,D,9,high dufours,s. mar
+D10,D,10,high dufours,s. mar
+D11,D,11,c,s. mar
+D12,D,12,,
+E1,E,1,high dufours,s. mar
+E2,E,2,low dufours,s. mar
+E3,E,3,c,s. mar
+E4,E,4,low dufours,s. mar
+E5,E,5,low sternal,e. coli
+E6,E,6,low dufours,s. mar
+E7,E,7,low sternal,s. mar
+E8,E,8,low dufours,e. coli
+E9,E,9,c,s. mar
+E10,E,10,high sternal,e. coli
+E11,E,11,low dufours,s. mar
+E12,E,12,low dufours,s. mar
+F1,F,1,c,e. coli
+F2,F,2,c,e. coli
+F3,F,3,low sternal,s. mar
+F4,F,4,c,e. coli
+F5,F,5,high dufours,s. mar
+F6,F,6,high sternal,s. mar
+F7,F,7,high sternal,s. mar
+F8,F,8,low dufours,e. coli
+F9,F,9,high sternal,s. mar
+F10,F,10,high dufours,s. mar
+F11,F,11,low sternal,e. coli
+F12,F,12,low dufours,e. coli
+G1,G,1,low sternal,e. coli
+G2,G,2,low dufours,e. coli
+G3,G,3,c,e. coli
+G4,G,4,high sternal,s. mar
+G5,G,5,high sternal,e. coli
+G6,G,6,c,s. mar
+G7,G,7,high dufours,e. coli
+G8,G,8,c,s. mar
+G9,G,9,high sternal,e. coli
+G10,G,10,c,e. coli
+G11,G,11,low sternal,s. mar
+G12,G,12,high dufours,e. coli
+H1,H,1,c,e. coli
+H2,H,2,high dufours,s. mar
+H3,H,3,low sternal,e. coli
+H4,H,4,low sternal,e. coli
+H5,H,5,low sternal,s. mar
+H6,H,6,high dufours,e. coli
+H7,H,7,c,e. coli
+H8,H,8,high dufours,s. mar
+H9,H,9,high sternal,e. coli
+H10,H,10,low sternal,s. mar
+H11,H,11,low sternal,e. coli
+H12,H,12,high sternal,e. coli

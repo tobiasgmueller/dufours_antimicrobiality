@@ -224,7 +224,7 @@ grofit %>%
   group_by(treatment) %>%
   summarise(max=max(A.model), avg=mean(A.model))
 
-grofit%>%
+muscle_alpha <- grofit%>%
   ggplot(aes(x=treatment, y=A.model))+
   geom_boxplot(aes(fill=treatment), alpha=.5)+
   geom_jitter(aes(fill=treatment), shape=21, color="black")+
@@ -232,6 +232,13 @@ grofit%>%
   xlab("Treatment")+
   facet_wrap(~microbe)+
   scale_fill_brewer(palette = "Set2")
+muscle_alpha
+
+ggsave(plot=muscle_alpha,"output/graphs/muscletest_alpha.png",
+       width = 6,
+       height = 3)
+
+
 
 grofit%>%
   ggplot(aes(x=treatment, y=mu.model))+

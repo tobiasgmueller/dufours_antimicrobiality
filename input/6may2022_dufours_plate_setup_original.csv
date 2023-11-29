@@ -1,0 +1,97 @@
+well,treatment,treatment,microbe
+A1, 1/8,Low,S17-1
+A2,Control,Control,S17-1
+A3, 1/4,Medium,SCC477
+A4,Streptomycin,Streptomycin,DC3000
+A5,Control,Control,S17-1
+A6, 1/2,High,DC3000
+A7, 1/8,Low,SCC477
+A8, 1/2,High,S17-1
+A9, 1/2,High,SCC477
+A10, 1/8,Low,SCC477
+A11, 1/4,Medium,DC3000
+A12, 1/4,Medium,DC3000
+B1,Control,Control,DC3000
+B2, 1/8,Low,2698B
+B3, 1/8,Low,DC3000
+B4,Streptomycin,Streptomycin,S17-1
+B5, 1/4,Medium,SCC477
+B6,Control,Control,2698B
+B7, 1/8,Low,SCC477
+B8,Streptomycin,Streptomycin,DC3000
+B9, 1/4,Medium,DC3000
+B10,Control,Control,SCC477
+B11,Control,Control,S17-1
+B12, 1/8,Low,DC3000
+C1,Control,Control,S17-1
+C2,Control,Control,SCC477
+C3, 1/4,Medium,2698B
+C4, 1/8,Low,S17-1
+C5, 1/2,High,SCC477
+C6, 1/4,Medium,SCC477
+C7,Streptomycin,Streptomycin,S17-1
+C8, 1/8,Low,2698B
+C9, 1/4,Medium,S17-1
+C10,Streptomycin,Streptomycin,SCC477
+C11,Streptomycin,Streptomycin,S17-1
+C12,Control,Control,SCC477
+D1, 1/8,Low,DC3000
+D2, 1/4,Medium,S17-1
+D3, 1/2,High,2698B
+D4, 1/2,High,2698B
+D5,Streptomycin,Streptomycin,SCC477
+D6, 1/8,Low,DC3000
+D7,Streptomycin,Streptomycin,2698B
+D8, 1/8,Low,S17-1
+D9, 1/8,Low,2698B
+D10, 1/2,High,2698B
+D11, 1/4,Medium,S17-1
+D12,Control,Control,SCC477
+E1, 1/8,Low,DC3000
+E2, 1/4,Medium,2698B
+E3, 1/4,Medium,2698B
+E4,Streptomycin,Streptomycin,SCC477
+E5,Control,Control,DC3000
+E6, 1/8,Low,S17-1
+E7,Streptomycin,Streptomycin,DC3000
+E8, 1/2,High,2698B
+E9, 1/2,High,DC3000
+E10,Streptomycin,Streptomycin,SCC477
+E11, 1/8,Low,SCC477
+E12,Control,Control,DC3000
+F1,Control,Control,2698B
+F2,Control,Control,2698B
+F3,Control,Control,2698B
+F4, 1/4,Medium,DC3000
+F5, 1/2,High,DC3000
+F6,Streptomycin,Streptomycin,DC3000
+F7, 1/2,High,SCC477
+F8, 1/2,High,DC3000
+F9, 1/2,High,S17-1
+F10, 1/8,Low,S17-1
+F11, 1/2,High,DC3000
+F12, 1/4,Medium,2698B
+G1,Streptomycin,Streptomycin,2698B
+G2,Control,Control,DC3000
+G3, 1/2,High,SCC477
+G4, 1/2,High,S17-1
+G5,Streptomycin,Streptomycin,S17-1
+G6, 1/4,Medium,SCC477
+G7, 1/4,Medium,SCC477
+G8, 1/8,Low,SCC477
+G9,Control,Control,SCC477
+G10, 1/2,High,S17-1
+G11, 1/2,High,S17-1
+G12, 1/4,Medium,S17-1
+H1, 1/4,Medium,S17-1
+H2, 1/2,High,SCC477
+H3,Control,Control,S17-1
+H4, 1/8,Low,2698B
+H5,Streptomycin,Streptomycin,2698B
+H6,Streptomycin,Streptomycin,2698B
+H7,Streptomycin,Streptomycin,S17-1
+H8,Streptomycin,Streptomycin,SCC477
+H9,Control,Control,DC3000
+H10,Streptomycin,Streptomycin,DC3000
+H11, 1/4,Medium,DC3000
+H12,,,

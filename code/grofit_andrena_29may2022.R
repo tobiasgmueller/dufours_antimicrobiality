@@ -222,7 +222,46 @@ alpha<- grofit %>%
   scale_fill_brewer(palette = "Set2")
 alpha
 
-ggsave(plot=alpha,"output/graphs/grofit_alpha_andrena_29may2022.pdf")
+ggsave(plot=alpha,"output/graphs/grofit_alpha_andrena_29may2022.png",
+       width = 6,
+       height = 3)
+
+
+
+
+#and now split just dufours and just sternal for presentation
+
+alpha_sternal<- grofit %>%
+  filter(gland == "sternal") %>%
+  ggplot(aes(x=treatment, y=A.model))+
+  geom_boxplot(aes(fill=treatment), alpha=.5)+
+  geom_jitter(aes(fill=treatment), shape=21, color="black")+
+  ylab("Max growth")+
+  xlab("Treatment")+
+  facet_wrap("microbe")+
+  scale_fill_brewer(palette = "Set2")
+alpha_sternal
+
+ggsave(plot=alpha_sternal,"output/graphs/grofit_alphasternal_andrena_29may2022.png",
+       width = 6,
+       height = 3)
+
+
+alpha_dufours<- grofit %>%
+  filter(gland == "dufours") %>%
+  ggplot(aes(x=treatment, y=A.model))+
+  geom_boxplot(aes(fill=treatment), alpha=.5)+
+  geom_jitter(aes(fill=treatment), shape=21, color="black")+
+  ylab("Max growth")+
+  xlab("Treatment")+
+  facet_wrap("microbe")+
+  scale_fill_brewer(palette = "Set2")
+alpha_dufours
+
+ggsave(plot=alpha_dufours,"output/graphs/grofit_alphadufours_andrena_29may2022.png",
+       width = 6,
+       height = 3)
+
 
 
 
@@ -233,7 +272,8 @@ grofit %>%
 grofit %>%
   group_by(gland,microbe)%>%
   dunn_test(A.model ~ treatment) %>%
-  print(n=40)
+  print(n=40)%>%
+  write.csv("output/tables/dunntest_alpha_andrena_29may2022.csv")
 
 
 
