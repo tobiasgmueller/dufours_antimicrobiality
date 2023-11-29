@@ -114,7 +114,6 @@ od_raw <- gr%>%
 
 
 
-
 #graphing curves to visually check things
 grow.long <- grow.m2%>%
   melt(id.vars = c("treatment","microbe","gland"), value.name = "od", variable.name = "time")
