@@ -7,7 +7,6 @@
 
 #------------------- setup and packages ---------------------------------------
 
-#setwd("C:/Users/obiew/Desktop/vannette/growthassay_2021")
 
 library(grofit)
 library(ggplot2)
@@ -22,14 +21,13 @@ rm(list = ls())
 #---------------------- part I --  reformatting the df --------------------------------------------------
 
 #read in data 
-d <- read.csv("input/4mMh2o2_5april2021_export.csv")
+d <- read_csv("input/.csv")%>%
+  mutate(treatment = as.factor(treatment),
+         well = as.factor(well),
+         microbe = as.factor(microbe))%>%
 labels <- read.csv("input/2021labels.csv")
 d <- rename(d, c("time" = "Time"))
 
-# fix labels classes
-labels$treatment <- as.factor(labels$treatment)
-labels$well <- as.factor(labels$well)
-labels$microbe <- as.factor(labels$microbe)
 
 
 # make time in minutes (rounded to nearest 15 (1 read is taken every 15 minutes)
