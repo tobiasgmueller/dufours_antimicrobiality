@@ -1,0 +1,97 @@
+well,treatment,microbe,species
+A1,gland,e. coli,a_regularis
+A2,gland,s. mar,a_regularis
+A3,gland,s. mar,a_regularis
+A4,gland,e. coli,a_regularis
+A5,spin,s. mar,a_regularis
+A6,gland,s. mar,a_regularis
+A7,muscle,s. mar,a_regularis
+A8,spin,e. coli,a_regularis
+A9,muscle,e. coli,a_regularis
+A10,spin,e. coli,a_regularis
+A11,gland,s. mar,a_regularis
+A12,spin,s. mar,a_regularis
+B1,gland,e. coli,a_regularis
+B2,spin,e. coli,a_regularis
+B3,gland,s. mar,a_regularis
+B4,spin,e. coli,a_regularis
+B5,gland,s. mar,a_regularis
+B6,muscle,s. mar,a_regularis
+B7,spin,s. mar,a_regularis
+B8,spin,e. coli,a_regularis
+B9,muscle,s. mar,a_regularis
+B10,spin,e. coli,a_regularis
+B11,spin,e. coli,a_regularis
+B12,spin,s. mar,a_regularis
+C1,muscle,s. mar,a_regularis
+C2,muscle,e. coli,a_regularis
+C3,gland,s. mar,a_regularis
+C4,muscle,s. mar,a_regularis
+C5,muscle,e. coli,a_regularis
+C6,spin,s. mar,a_regularis
+C7,spin,s. mar,a_regularis
+C8,spin,e. coli,a_regularis
+C9,muscle,s. mar,a_regularis
+C10,muscle,s. mar,a_regularis
+C11,gland,e. coli,a_regularis
+C12,gland,e. coli,a_regularis
+D1,muscle,e. coli,a_regularis
+D2,spin,s. mar,a_regularis
+D3,spin,s. mar,a_regularis
+D4,gland,e. coli,a_regularis
+D5,muscle,e. coli,a_regularis
+D6,gland,e. coli,a_regularis
+D7,muscle,e. coli,a_regularis
+D8,muscle,s. mar,a_regularis
+D9,muscle,e. coli,a_regularis
+D10,gland,e. coli,a_regularis
+D11,gland,s. mar,a_regularis
+D12,muscle,e. coli,a_regularis
+E1,,,
+E2,,,
+E3,,,
+E4,,,
+E5,,,
+E6,,,
+E7,,,
+E8,,,
+E9,,,
+E10,,,
+E11,,,
+E12,,,
+F1,,,
+F2,,,
+F3,,,
+F4,,,
+F5,,,
+F6,,,
+F7,,,
+F8,,,
+F9,,,
+F10,,,
+F11,,,
+F12,,,
+G1,,,
+G2,,,
+G3,,,
+G4,,,
+G5,,,
+G6,,,
+G7,,,
+G8,,,
+G9,,,
+G10,,,
+G11,,,
+G12,,,
+H1,,,
+H2,,,
+H3,,,
+H4,,,
+H5,,,
+H6,,,
+H7,,,
+H8,,,
+H9,,,
+H10,,,
+H11,,,
+H12,,,

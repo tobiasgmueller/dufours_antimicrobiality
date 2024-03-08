@@ -1,13 +1,23 @@
 # grofit analysis, updated from my older code, to analyze 96 well optical curves.
-# template code
+# may 2022
+# Tobias Mueller
+
+
+# skip data read in and curve fitting if not running on a new plate
+# these have already been done and saved as a csv.
 
 
 
-## first load packages and grofit ####
 
-# grofit is no longer updated on CRAN so must be downloaded manually from here `[https://cran.r-project.org/src/contrib/Archive/grofit/]`
-# easiest way  is to download from link above and *use rtools* to install with line below
-#install.packages("grofit_1.1.1-1.tar.gz",repos=NULL, type="source")
+## first packages and grofit ####
+
+# grofit is no longer updated on CRAN so must be downloaded manually here `[https://cran.r-project.org/src/contrib/Archive/grofit/]`
+#easiest way  is to download from link above and *use rtools* to install with line below
+# install.packages("C:/Users/obiew/Desktop/github/dufours_antimicrobiality/grofit_1.1.1-1.tar.gz",
+#                  repos=NULL,
+#                  type="source")
+
+
 
 library(tidyverse)
 library(data.table) #used for grofit prep
@@ -15,16 +25,17 @@ library(grofit)
 library(RColorBrewer)# for graph colors
 library(rstatix) # pipeline friendly stats analysis
 
+
 rm(list = ls())
 
 
 # set meta information 
-data = "data.csv" # name of data file
-label = "label.csv" #name of label file
-plate_run = "species_date" #name of plate run. generally species and date of plate run
-
+data = "muscle_spin_glandfeb20_2024.csv" # name of data file
+label = "muscle_spin_glandfeb20_2024_plate_setup.csv" #name of label file
+plate_run = "muscle_spin_glandfeb20_2024" #name of plate run
 
 ### read in data ####
+
 d <- read.csv(file=paste("input/", data, sep=""))
 labels <- read.csv(file=paste("input/", label, sep=""))%>%
   mutate(treatment = as.factor(treatment),
@@ -32,12 +43,16 @@ labels <- read.csv(file=paste("input/", label, sep=""))%>%
          microbe = as.factor(microbe),
          species=as.factor(species))
 
+
 d <- rename(d, c("time" = "Time")) #because i dont like capitals
+
+
 
 
 # make time in minutes (rounded to nearest 15 (1 read is taken every 15 minutes)
 d$time <- (seq.int(nrow(d)))*15
  
+
 
 #now to get it to match the required df format of grofit
 
@@ -68,6 +83,8 @@ write_csv(gr, file= paste("formatted_OD_values/", plate_run, "_formatted.csv", s
 
 
 ### grofit curve fitting ####
+
+
 
 t<- gr%>%
   select(!c("microbe","treatment","time","species"))
@@ -146,17 +163,15 @@ control1<-grofit.control(fit.opt="b", log.y.gc=FALSE, interactive=T)
 growth.test<-gcFit(times,grow.m2, control=control1)
 
 
-
-
-# post curve verification -------------------------------------------------
-
-
 #use the built in summary function and write parameters  a df
 grofit<-summary.gcFit(growth.test)
 
 # lambda = length of lag phase
 # mu = maximum growth rate
 # A = carrying capacity
+
+
+
 
 
 #then remove unreliable wells
@@ -183,8 +198,6 @@ grofit <- droplevels(grofit)
 
 # then write to csv for use later in analysis
 write_csv(grofit, file = paste("output/", plate_run, "_grofitresults.csv", sep=""))
-
-
 
 
 # start here for analysis ####
